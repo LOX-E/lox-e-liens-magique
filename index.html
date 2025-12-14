@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portail LOX E</title>
+  <style>
+    /* Reset & layout */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html,body { height: 100%; }
+    body {
+      min-height: 100vh;
+      font-family: Inter, system-ui, Arial, sans-serif;
+      color: #fff;
+      background: linear-gradient(120deg, #0f172a, #0b3d91, #7b2ff7);
+      background-size: 600% 600%;
+      animation: gradientShift 18s ease infinite;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 28px;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Page container */
+    .page-wrap {
+      width: 100%;
+      max-width: 1400px;
+      display: flex;
+      gap: 28px;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+
+    /* LEFT: large block for main features */
+    .col-left {
+      flex: 1 1 980px;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: stretch;
+      transition: opacity 420ms cubic-bezier(.2,.9,.2,1), transform 420ms cubic-bezier(.2,.9,.2,1), visibility 420ms;
+      will-change: opacity, transform;
+    }
+    .col-left.vanish {
+      opacity: 0;
+      transform: scale(0.98) translateY(8px);
+      pointer-events: none;
+      visibility: hidden;
+    }
+
+    /* RIGHT: tools block pinned to the right */
+    .col-right {
+      width: 260px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+      position: sticky;
+      top: 28px;
+      height: fit-content;
+    }
+
+    /* Main card (big left block) */
+    .card {
+      background: rgba(255,255,255,0.06);
+      border-radius: 14px;
+      padding: 28px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(255,255,255,0.06);
+      position: relative;
+      overflow: visible;
+      z-index: 2;
+    }
+
+    header.top {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .brand { display:flex; gap:12px; align-items:center; }
+    .brand h1 { font-size:1.6rem; margin:0; }
+    .actions { display:flex; gap:8px; align-items:center; }
+
+    .btn {
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 160ms ease, box-shadow 160ms ease, opacity 160ms;
+    }
+    .btn:active { transform: translateY(1px) scale(0.995); }
+    .btn.primary { background: linear-gradient(90deg,#ffd166,#ff6b6b); color:#081229; box-shadow:0 8px 24px rgba(255,107,107,0.18); }
+    .btn.ghost { background: rgba(255,255,255,0.06); color:#fff; border:1px solid rgba(255,255,255,0.06); }
+    .btn.danger { background: linear-gradient(90deg,#ff6b6b,#ff3b3b); color:#081229; }
+
+    .lead { font-size:1rem; color: rgba(255,255,255,0.95); margin-bottom:8px; }
+
+    .links { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin-top:6px; }
+    .link { display:block; padding:14px 16px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02)); color:#fff; text-decoration:none; transition:transform 220ms, box-shadow 220ms; box-shadow:0 4px 14px rgba(2,6,23,0.35); border:1px solid rgba(255,255,255,0.03); }
+    .link:hover { transform: translateY(-4px); box-shadow:0 10px 30px rgba(2,6,23,0.45); }
+    .link.disabled { opacity:0.6; cursor:default; pointer-events:none; }
+    .link .title { font-weight:800; margin-bottom:6px; font-size:1.02rem; }
+    .link .desc { font-size:0.92rem; color:rgba(255,255,255,0.88); }
+
+    .signup { margin-top:20px; background:rgba(0,0,0,0.18); border-radius:10px; padding:14px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap; border:1px solid rgba(255,255,255,0.04); }
+    .signup .text { color:#fff; font-weight:700; font-size:1rem; }
+    .signup form { display:flex; gap:8px; align-items:center; }
+    .signup input[type="email"] { padding:10px 12px; border-radius:8px; border:none; outline:none; min-width:260px; background: rgba(255,255,255,0.03); color: #fff; }
+    .signup button { padding:8px 12px; border-radius:8px; border:none; background:#2dd4bf; color:#042027; font-weight:700; cursor:pointer; }
+
+    .note { font-size:0.88rem; color:rgba(255,255,255,0.78); margin-top:8px; }
+
+    /* Finance cards */
+    .finance {
+      margin-top:18px;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      flex-wrap:wrap;
+    }
+    .finance .card-mini {
+      flex:1 1 320px;
+      background: rgba(255,255,255,0.03);
+      padding:12px;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,0.03);
+    }
+    .badge { display:inline-block; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,0.06); font-weight:700; color:#fff; font-size:0.8rem; }
+
+    /* Donate buttons active state */
+    .donate-btn.active { box-shadow: 0 10px 30px rgba(45,212,191,0.12); transform: translateY(-3px); outline: 2px solid rgba(45,212,191,0.08); }
+
+    /* Tools block (right) */
+    .tools-block {
+      background: rgba(255,255,255,0.04);
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 8px 30px rgba(2,6,23,0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      align-items: stretch;
+    }
+    .tools-block h4 { margin: 0 0 4px 0; font-size: 1rem; font-weight:800; }
+    .tools-block .desc { font-size: 0.88rem; color: rgba(255,255,255,0.85); }
+
+    .tools-block .btn {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 800;
+    }
+    .tools-block .btn.kill {
+      background: linear-gradient(90deg,#ff6b6b,#ff3b3b);
+      color:#081229;
+      box-shadow:0 8px 30px rgba(255,60,60,0.18);
+    }
+    .tools-block .btn.reset {
+      background: linear-gradient(90deg,#2dd4bf,#10b981);
+      color:#042027;
+      font-weight:700;
+      box-shadow:0 8px 30px rgba(16,185,129,0.12);
+    }
+    .tools-block .btn.small {
+      padding: 8px 10px;
+      font-weight:700;
+      border-radius:8px;
+      background: rgba(255,255,255,0.04);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    /* Right extras: dark mode & dev mode */
+    .control-row { display:flex; gap:8px; align-items:center; justify-content:space-between; }
+    .toggle {
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .toggle input[type="checkbox"] { width: 44px; height: 24px; appearance: none; background: rgba(255,255,255,0.06); border-radius: 999px; position: relative; cursor: pointer; outline: none; transition: background 200ms; }
+    .toggle input[type="checkbox"]::after {
+      content: '';
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 200ms;
+    }
+    .toggle input[type="checkbox"]:checked { background: linear-gradient(90deg,#ffd166,#ff6b6b); }
+    .toggle input[type="checkbox"]:checked::after { transform: translateX(20px); }
+
+    .dev-block { display:flex; gap:8px; align-items:center; justify-content:space-between; padding:8px; border-radius:8px; background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.03); }
+    .dev-block .label { font-weight:700; font-size:0.95rem; }
+    .dev-block .soon { font-size:0.78rem; padding:4px 8px; border-radius:999px; background: rgba(255,255,255,0.04); color:#fff; }
+
+    .small-note { font-size:0.82rem; color: rgba(255,255,255,0.72); margin-top:6px; }
+
+    /* VIP card under main */
+    .vip-card {
+      background: rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 16px;
+      border: 1px solid rgba(255,255,255,0.04);
+      box-shadow: 0 8px 24px rgba(2,6,23,0.45);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 18px; /* slightly lower than main content */
+    }
+    .vip-left { display:flex; flex-direction:column; gap:6px; }
+    .vip-left .title { font-weight:800; font-size:1.05rem; }
+    .vip-left .status { font-size:0.92rem; color: rgba(255,255,255,0.85); }
+
+    .vip-actions { display:flex; gap:8px; align-items:center; }
+
+    .vip-key { padding:8px 10px; border-radius:8px; border:none; background: linear-gradient(90deg,#ffd166,#ff6b6b); color:#081229; font-weight:800; cursor:pointer; }
+    .vip-pro { padding:8px 10px; border-radius:8px; border:none; background: linear-gradient(90deg,#7b2ff7,#4c1d95); color:#fff; font-weight:800; cursor:pointer; }
+
+    .vip-indicator { font-size:0.85rem; padding:6px 8px; border-radius:999px; background: rgba(255,255,255,0.04); color:#fff; font-weight:700; }
+
+    /* PRO card (below VIP) */
+    .pro-card {
+      background: rgba(255,255,255,0.045);
+      border-radius: 12px;
+      padding: 12px 16px;
+      border: 1px solid rgba(255,255,255,0.035);
+      box-shadow: 0 6px 20px rgba(2,6,23,0.35);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-top: 10px;
+    }
+    .pro-left { display:flex; flex-direction:column; gap:6px; }
+    .pro-left .title { font-weight:800; font-size:0.98rem; }
+    .pro-left .status { font-size:0.88rem; color: rgba(255,255,255,0.82); }
+
+    .pro-actions { display:flex; gap:8px; align-items:center; }
+
+    /* Debris & effects */
+    .debris { position:fixed; inset:0; pointer-events:none; z-index:6; overflow:visible; }
+    .debris .piece { position:absolute; width:10px; height:10px; background:rgba(255,255,255,0.9); border-radius:2px; transform-origin:center; will-change:transform,opacity; }
+
+    .kill-flash {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, rgba(255,255,255,0.95), rgba(255,255,255,0.6) 20%, rgba(255,255,255,0) 40%);
+      pointer-events: none;
+      z-index: 10005;
+      opacity: 0;
+      transition: opacity 220ms ease;
+    }
+    .kill-shockwave {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      transform: translate(-50%,-50%) scale(0);
+      background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(255,255,255,0.12));
+      z-index: 10006;
+      pointer-events: none;
+      opacity: 0.95;
+      mix-blend-mode: screen;
+      filter: blur(6px);
+    }
+
+    @keyframes screenShake {
+      0% { transform: translateY(0) rotate(0deg); }
+      20% { transform: translateY(-8px) rotate(-0.6deg); }
+      40% { transform: translateY(6px) rotate(0.6deg); }
+      60% { transform: translateY(-4px) rotate(-0.3deg); }
+      80% { transform: translateY(2px) rotate(0.2deg); }
+      100% { transform: translateY(0) rotate(0deg); }
+    }
+    .kill-shake {
+      animation: screenShake 900ms cubic-bezier(.2,.9,.2,1);
+      transform-origin: center;
+    }
+
+    /* Particles canvas sits behind content but doesn't block scroll */
+    #particles { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.28; }
+
+    /* Modal for VIP/PRO codes */
+    .modal-backdrop { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; background: rgba(2,6,23,0.6); z-index: 10020; }
+    .modal-backdrop.active { display:flex; }
+    .modal-card { width: min(420px, 94%); background: #071029; border-radius: 12px; padding: 18px; border: 1px solid rgba(255,255,255,0.06); color: #fff; box-shadow: 0 12px 40px rgba(2,6,23,0.6); }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      background: rgba(0,0,0,0.7);
+      color: #fff;
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+      z-index: 10050;
+      transform: translateY(12px);
+      opacity: 0;
+      transition: transform 220ms, opacity 220ms;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; pointer-events: auto; }
+
+    /* Responsive: stack columns on small screens, keep tools block on top */
+    @media (max-width: 900px) {
+      .page-wrap { flex-direction: column-reverse; gap: 18px; }
+      .col-right { position: relative; width: 100%; top: 0; }
+      .tools-block { align-items: stretch; }
+      .vip-card { flex-direction: column; align-items: stretch; }
+      .vip-actions { justify-content: flex-end; width: 100%; }
+      .pro-card { flex-direction: column; align-items: stretch; }
+    }
+
+    @media (max-width:600px) {
+      .brand h1 { font-size:1rem; }
+      .links { grid-template-columns: 1fr; }
+      .col-left { padding-bottom: 40px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="particles" aria-hidden="true"></canvas>
+
+  <div class="page-wrap">
+    <!-- LEFT: main features (big block) -->
+    <div class="col-left" id="colLeft">
+      <main class="card" id="mainCard" role="main" aria-live="polite">
+        <header class="top">
+          <div class="brand">
+            <h1>LOX E — Portail</h1>
+            <span class="badge">LOX E Connect</span>
+          </div>
+
+          <div class="actions">
+            <button class="btn ghost" id="btnLogin">Se connecter</button>
+            <button class="btn primary" id="btnSignup">S'inscrire</button>
+            <button class="btn" id="btnDonate">Faire un don</button>
+          </div>
+        </header>
+
+        <p class="lead">C'est ici que sont référencés les sites pour qu'ils puissent être indexés sur Google.</p>
+
+        <div class="links" aria-label="Liens">
+          <a class="link" href="https://ladigitale.dev/digisteps/#/s/69374e5fe42f7" target="_blank" rel="noopener noreferrer">
+            <div class="title">LOX E Connect</div>
+            <div class="desc">Accède à LOX E Connect (ouvre dans un nouvel onglet).</div>
+          </a>
+
+          <div class="link disabled" aria-disabled="true">
+            <div class="title">Lien 2</div>
+            <div class="desc">Pas encore disponible</div>
+          </div>
+
+          <div class="link disabled" aria-disabled="true">
+            <div class="title">Lien 3</div>
+            <div class="desc">Pas encore disponible</div>
+          </div>
+
+          <div class="link disabled" aria-disabled="true">
+            <div class="title">Lien 4</div>
+            <div class="desc">Pas encore disponible</div>
+          </div>
+        </div>
+
+        <!-- Inscription via Google Form -->
+        <div class="signup" role="region" aria-label="Inscription au projet">
+          <div>
+            <div class="text">Inscris‑toi au projet</div>
+            <div class="note">Reçois les nouvelles et les mises à jour du projet LOX E.</div>
+          </div>
+
+          <!-- Formulaire POST vers Google Form (champ entry fourni) -->
+          <form id="signupForm" action="https://docs.google.com/forms/d/e/1FAIpQLSe2x90o3VnYxKNVc38e0S8N-4pFURRFA7cpmfwNzES4c-Fqtg/formResponse" method="POST" target="hidden_iframe" onsubmit="onSignupSubmit(event)">
+            <input id="signupEmail" name="entry.1746904549" type="email" placeholder="Ton adresse e‑mail" required />
+            <button type="submit">S'inscrire</button>
+          </form>
+          <iframe name="hidden_iframe" style="display:none;"></iframe>
+        </div>
+
+        <!-- Aide financière / Parrainage -->
+        <section class="finance" aria-label="Aide financière et parrainage">
+          <div class="card-mini">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <strong>Aide financière</strong>
+              <span class="badge">Soutenir</span>
+            </div>
+            <p class="note" style="margin-top:8px">Si tu veux soutenir le projet, tu peux faire un don. Merci pour ton aide.</p>
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn primary donate-btn" id="donateQuick10" data-amount="5">Don 5€</button>
+              <button class="btn primary donate-btn" id="donateQuick25" data-amount="10">Don 10€</button>
+              <button class="btn primary donate-btn" id="donateQuick50" data-amount="25">Don 25€</button>
+              <button class="btn ghost" id="donateCustomOpen">Montant libre</button>
+            </div>
+          </div>
+
+          <div class="card-mini">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <strong>Parrainage (affiliation)</strong>
+              <span class="badge">Prochainement</span>
+            </div>
+            <p class="note" style="margin-top:8px">Liens de parrainage et boutiques partenaires (Amazon, etc.). Mise en place prochaine.</p>
+            <ul style="margin-top:10px; list-style:none; padding-left:0;">
+              <li style="margin-bottom:8px;"><a class="link disabled" href="#" aria-disabled="true">Amazon — Parrainage (Prochainement)</a></li>
+              <li style="margin-bottom:8px;"><a class="link disabled" href="#" aria-disabled="true">Boutique partenaire (Prochainement)</a></li>
+            </ul>
+          </div>
+        </section>
+
+        <p class="note">Remarque : les inscriptions sont envoyées vers un Google Form configuré. Les dons utilisent PayPal en lien externe.</p>
+
+        <!-- VIP area under main (slightly lower) -->
+        <div class="vip-card" id="vipCard" aria-label="V.I.P.">
+          <div class="vip-left">
+            <div class="title">V.I.P.</div>
+            <div class="status" id="vipStatus">Prochainement — accès restreint pour testeurs</div>
+          </div>
+
+          <div class="vip-actions">
+            <div id="vipIndicator" class="vip-indicator" style="display:none">BETA</div>
+            <button id="vipKeyBtn" class="vip-key" title="Entrer clé BETA">Clé BETA</button>
+          </div>
+        </div>
+
+        <!-- PRO area transformed into its own card below VIP -->
+        <div class="pro-card" id="proCard" aria-label="PRO">
+          <div class="pro-left">
+            <div class="title">PRO</div>
+            <div class="status" id="proStatus">Prochainement — version avancée</div>
+          </div>
+
+          <div class="pro-actions">
+            <div id="proIndicator" class="vip-indicator" style="display:none">PRO</div>
+            <button id="proKeyBtn" class="vip-key" title="Entrer clé PRO">Clé PRO</button>
+          </div>
+        </div>
+
+        <!-- Add extra vertical space so the page can scroll naturally for testing -->
+        <div style="height: 260px;"></div>
+      </main>
+
+      <!-- Modals (VIP/PRO code entry) -->
+      <div class="modal-backdrop" id="vipModal" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="modal-card" role="document" aria-labelledby="vipTitle">
+          <h3 id="vipTitle">Accès V.I.P. / PRO</h3>
+          <p style="margin-top:8px;color:rgba(255,255,255,0.85)" id="vipModalDesc">Entre ta clé pour activer l'accès.</p>
+          <div style="margin-top:12px;display:flex;gap:8px;">
+            <input id="vipCodeInput" type="text" placeholder="Saisis la clé" style="flex:1;padding:10px;border-radius:8px;border:none;outline:none;background:rgba(255,255,255,0.03);color:#fff" />
+            <button id="vipSubmit" class="btn primary">Valider</button>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+            <button id="vipCancel" class="btn ghost">Annuler</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modals (kept hidden by default) -->
+      <div class="modal-backdrop" id="modalAuth" style="display:none;">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+          <h3 id="authTitle">Connexion / Inscription</h3>
+          <div id="authContent" style="margin-top:8px">
+            <div style="margin-bottom:8px">Connecte‑toi ou crée un compte local (simulation).</div>
+            <div class="row">
+              <input id="authEmail" type="email" placeholder="Adresse e‑mail" style="width:100%;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff" />
+            </div>
+            <div class="row" style="margin-top:8px">
+              <input id="authPassword" type="password" placeholder="Mot de passe" style="width:100%;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff" />
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+              <button class="btn ghost" id="authClose">Annuler</button>
+              <button class="btn primary" id="authLogin">Se connecter</button>
+              <button class="btn" id="authRegister">S'inscrire</button>
+            </div>
+            <p class="note" style="margin-top:10px">Conseil : pour enregistrer réellement des connexions, utilise un service d'authentification (Firebase Auth, Supabase Auth) ou un backend sécurisé.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-backdrop" id="modalDonate" style="display:none;">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="donateTitle">
+          <h3 id="donateTitle">Faire un don</h3>
+          <div>
+            <p class="note">Les dons sont traités via PayPal (lien externe). Montants rapides ou montant libre.</p>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button class="btn primary" data-amount="5">5€</button>
+              <button class="btn primary" data-amount="10">10€</button>
+              <button class="btn primary" data-amount="25">25€</button>
+            </div>
+            <div style="margin-top:10px">
+              <input id="donateCustom" type="text" placeholder="Montant libre en €" style="width:100%;padding:10px;border-radius:8px;border:none;background:rgba(255,255,255,0.03);color:#fff" />
+            </div>
+            <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+              <button class="btn ghost" id="donateClose">Annuler</button>
+              <button class="btn primary" id="donateProceed">Procéder au don</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: tools block (pinned to the right, visible while scrolling) -->
+    <aside class="col-right" aria-hidden="false">
+      <div class="tools-block" role="region" aria-label="Outils">
+        <h4>Outils</h4>
+        <div class="desc">Zone dédiée aux contrôles et aux options.</div>
+
+        <div style="display:flex;gap:8px;flex-direction:column;">
+          <button id="killBtn" class="btn kill" title="Kill site (simulation)">KILL SITE</button>
+          <button id="resetBtn" class="btn reset" title="Reset simulation">RESET</button>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:6px">
+          <button id="miniFlash" class="btn small">Flash</button>
+          <button id="miniDebris" class="btn small">Debris</button>
+        </div>
+
+        <!-- Dark mode control (label changed to "Mode sombre") -->
+        <div class="control-row" style="margin-top:6px;">
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="font-weight:800">Mode sombre</div>
+            <div style="font-size:0.9rem;color:rgba(255,255,255,0.78)">Basculer thème</div>
+          </div>
+          <div class="toggle" title="Basculer mode clair/sombre">
+            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;">
+              <input id="darkToggle" type="checkbox" aria-label="Basculer thème" />
+            </label>
+          </div>
+        </div>
+
+        <!-- Developer mode (prochainement) -->
+        <div class="dev-block" aria-hidden="false">
+          <div>
+            <div class="label">Mode développeur</div>
+            <div style="font-size:0.85rem;color:rgba(255,255,255,0.78)">Outils avancés pour devs</div>
+          </div>
+          <div class="soon">Prochainement</div>
+        </div>
+
+        <!-- Mini note about upcoming features -->
+        <div class="small-note">D'autres fonctionnalités arriveront bientôt : tableau de bord, intégrations partenaires, et plus encore.</div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="debris" id="debrisContainer" aria-hidden="true"></div>
+  <div class="kill-flash" id="killFlash" aria-hidden="true"></div>
+  <div class="kill-shockwave" id="killShock" aria-hidden="true"></div>
+
+  <!-- Modal succès inscription -->
+  <div class="modal-backdrop" id="signupSuccessModal" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="signupSuccessTitle">
+    <div class="modal-card" role="document" style="max-width:420px;">
+      <h3 id="signupSuccessTitle">Inscription reçue</h3>
+      <p style="margin-top:8px;color:rgba(255,255,255,0.9)">Merci ! Ton adresse a bien été envoyée.</p>
+      <p class="note" style="margin-top:8px">Si tu souhaites soutenir le projet, tu peux faire un don via PayPal.</p>
+      <div style="display:flex;gap:8px;margin-top:12px;justify-content:flex-end">
+        <button id="signupSuccessClose" class="btn ghost">Fermer</button>
+        <button id="signupSuccessPay" class="btn primary">Faire un don</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    /* ---------- Configuration ---------- */
+    // Remplace 'my' par ton identifiant PayPal.me (ex: 'tonidentifiant')
+    const PAYPAL_ME_ID = 'my'; // <-- remplace ici par ton identifiant PayPal.me
+    const PAYPAL_BASE = 'https://paypal.me';
+    // VIP/PRO server validation endpoint (optionnel)
+    const VIP_VALIDATE_ENDPOINT = '/api/validate-key'; // exemple d'API Node/Express (voir plus bas)
+
+    /* ---------- Utilitaires UI ---------- */
+    function showToast(msg, ms = 2800) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(t._timeout);
+      t._timeout = setTimeout(() => { t.classList.remove('show'); }, ms);
+      console.log('[TOAST]', msg);
+    }
+
+    function openUrlInNewTab(url) {
+      window.open(url, '_blank', 'noopener');
+      console.log('[OPEN]', url);
+    }
+
+    /* ---------- Particles background ---------- */
+    (function(){
+      try {
+        const canvas = document.getElementById('particles');
+        if (!canvas) return;
+        const ctx = canvas.getContext && canvas.getContext('2d');
+        if (!ctx) return;
+
+        let w = canvas.width = window.innerWidth;
+        let h = canvas.height = window.innerHeight;
+        let particles = [];
+        const baseCount = Math.max(10, Math.round((w*h)/90000));
+        const MAX_PARTICLES = 420;
+
+        function rand(min, max) { return Math.random() * (max - min) + min; }
+
+        class P {
+          constructor() { this.reset(); }
+          reset() {
+            this.x = rand(0, w);
+            this.y = rand(0, h);
+            this.r = rand(0.6, 2.2);
+            this.vx = rand(-0.15, 0.15);
+            this.vy = rand(-0.05, 0.05);
+            this.alpha = rand(0.06, 0.28);
+            this.life = rand(60, 240);
+          }
+          update() {
+            this.x += this.vx;
+            this.y += this.vy;
+            this.life--;
+            if (this.life <= 0 || this.x < -20 || this.x > w+20 || this.y < -20 || this.y > h+20) this.reset();
+          }
+          draw() {
+            ctx.beginPath();
+            ctx.fillStyle = 'rgba(255,255,255,' + this.alpha + ')';
+            ctx.arc(this.x, this.y, this.r, 0, Math.PI*2);
+            ctx.fill();
+          }
+        }
+
+        function initParticles(count) {
+          particles = [];
+          const c = Math.min(MAX_PARTICLES, Math.max(6, count));
+          for (let i = 0; i < c; i++) particles.push(new P());
+        }
+
+        function resize() {
+          w = canvas.width = window.innerWidth;
+          h = canvas.height = window.innerHeight;
+          initParticles(baseCount);
+        }
+
+        window.addEventListener('resize', resize);
+        initParticles(baseCount);
+
+        function loop() {
+          ctx.clearRect(0,0,w,h);
+          for (let p of particles) { p.update(); p.draw(); }
+          requestAnimationFrame(loop);
+        }
+        requestAnimationFrame(loop);
+
+        window._particlesControl = {
+          intensify: (extra) => initParticles(Math.min(MAX_PARTICLES, baseCount + (extra||0))),
+          reset: () => initParticles(baseCount),
+          setOpacity: (o) => { canvas.style.opacity = o; }
+        };
+      } catch (e) {
+        console.error('Particles error:', e);
+      }
+    })();
+
+    /* ---------- Kill sound (WebAudio) ---------- */
+    function playBoom() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const now = ctx.currentTime;
+
+        const o1 = ctx.createOscillator();
+        const g1 = ctx.createGain();
+        o1.type = 'sawtooth';
+        o1.frequency.setValueAtTime(60, now);
+        g1.gain.setValueAtTime(0, now);
+        g1.gain.linearRampToValueAtTime(0.6, now + 0.02);
+        g1.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+        o1.connect(g1);
+        g1.connect(ctx.destination);
+        o1.start(now);
+        o1.stop(now + 1.2);
+
+        const o2 = ctx.createOscillator();
+        const g2 = ctx.createGain();
+        o2.type = 'triangle';
+        o2.frequency.setValueAtTime(220, now);
+        g2.gain.setValueAtTime(0, now);
+        g2.gain.linearRampToValueAtTime(0.5, now + 0.01);
+        g2.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+        o2.connect(g2);
+        g2.connect(ctx.destination);
+        o2.start(now);
+        o2.stop(now + 0.6);
+
+        const o3 = ctx.createOscillator();
+        const g3 = ctx.createGain();
+        o3.type = 'square';
+        o3.frequency.setValueAtTime(1200, now);
+        g3.gain.setValueAtTime(0, now);
+        g3.gain.linearRampToValueAtTime(0.35, now + 0.005);
+        g3.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+        o3.connect(g3);
+        g3.connect(ctx.destination);
+        o3.start(now);
+        o3.stop(now + 0.25);
+      } catch (e) {
+        console.warn('Audio not available', e);
+      }
+    }
+
+    /* ---------- Kill / Reset behavior with auto-restore ---------- */
+    (function(){
+      const killBtn = document.getElementById('killBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const miniFlash = document.getElementById('miniFlash');
+      const miniDebris = document.getElementById('miniDebris');
+      const flashEl = document.getElementById('killFlash');
+      const shockEl = document.getElementById('killShock');
+      const mainCard = document.getElementById('mainCard');
+      const debrisContainer = document.getElementById('debrisContainer');
+      const colLeft = document.getElementById('colLeft');
+      const particlesControl = window._particlesControl;
+
+      let killTimeout = null;
+      let isKilled = false;
+
+      function createDebrisPieces(count, scaleFactor = 1) {
+        debrisContainer.innerHTML = '';
+        const rect = mainCard.getBoundingClientRect();
+        for (let i = 0; i < count; i++) {
+          const piece = document.createElement('div');
+          piece.className = 'piece';
+          const pw = Math.max(6, Math.round((Math.random() * 28) * scaleFactor));
+          const ph = Math.max(6, Math.round((Math.random() * 28) * scaleFactor));
+          piece.style.width = pw + 'px';
+          piece.style.height = ph + 'px';
+          const x = rect.left + Math.random() * rect.width;
+          const y = rect.top + Math.random() * rect.height;
+          piece.style.left = x + 'px';
+          piece.style.top = y + 'px';
+          piece.style.background = `linear-gradient(180deg, rgba(255,255,255,${0.9 - Math.random()*0.3}), rgba(255,255,255,${0.5 - Math.random()*0.3}))`;
+          piece.style.opacity = 1;
+          debrisContainer.appendChild(piece);
+        }
+      }
+
+      function animateDebrisBlast() {
+        const pieces = Array.from(debrisContainer.children);
+        pieces.forEach((p) => {
+          const angle = Math.random() * Math.PI * 2;
+          const speed = 160 + Math.random() * 720;
+          const rot = (Math.random() - 0.5) * 1080;
+          const duration = 1200 + Math.random() * 1400;
+          p.animate([
+            { transform: 'translate(0px,0px) rotate(0deg) scale(1)', opacity: 1 },
+            { transform: `translate(${Math.cos(angle)*speed}px, ${Math.sin(angle)*speed}px) rotate(${rot}deg) scale(0.6)`, opacity: 0 }
+          ], {
+            duration,
+            easing: 'cubic-bezier(.2,.9,.2,1)',
+            delay: Math.random() * 220
+          });
+        });
+      }
+
+      function triggerFlash() {
+        flashEl.style.opacity = '1';
+        flashEl.style.transition = 'opacity 220ms ease';
+        setTimeout(() => { flashEl.style.opacity = '0'; }, 220);
+        // shockwave
+        shockEl.style.transform = 'translate(-50%,-50%) scale(0)';
+        shockEl.style.opacity = '0.95';
+        shockEl.style.transition = 'transform 700ms cubic-bezier(.2,.9,.2,1), opacity 700ms';
+        requestAnimationFrame(() => {
+          shockEl.style.transform = 'translate(-50%,-50%) scale(18)';
+          shockEl.style.opacity = '0';
+        });
+      }
+
+      function doKillSequence() {
+        if (isKilled) return;
+        isKilled = true;
+        console.log('[KILL] sequence started');
+        // Visual effects
+        createDebrisPieces(36, 1.2);
+        animateDebrisBlast();
+        mainCard.classList.add('kill-shake');
+        triggerFlash();
+        playBoom();
+        if (particlesControl && particlesControl.intensify) particlesControl.intensify(120);
+        // hide main content after short delay
+        setTimeout(() => {
+          colLeft.classList.add('vanish');
+        }, 700);
+
+        // auto restore after 6s
+        killTimeout = setTimeout(() => {
+          restoreFromKill();
+        }, 6000);
+      }
+
+      function restoreFromKill() {
+        if (!isKilled) return;
+        isKilled = false;
+        clearTimeout(killTimeout);
+        colLeft.classList.remove('vanish');
+        debrisContainer.innerHTML = '';
+        mainCard.classList.remove('kill-shake');
+        if (particlesControl && particlesControl.reset) particlesControl.reset();
+        console.log('[KILL] restored');
+      }
+
+      // Buttons
+      killBtn.addEventListener('click', () => {
+        doKillSequence();
+      });
+
+      resetBtn.addEventListener('click', () => {
+        restoreFromKill();
+      });
+
+      miniFlash.addEventListener('click', () => {
+        triggerFlash();
+      });
+
+      miniDebris.addEventListener('click', () => {
+        createDebrisPieces(18, 0.8);
+        animateDebrisBlast();
+      });
+
+      // quick donate buttons open donate modal
+      document.getElementById('donateQuick10').addEventListener('click', (e) => {
+        const amount = e.currentTarget.getAttribute('data-amount');
+        handleQuickDonate(amount, e.currentTarget);
+      });
+      document.getElementById('donateQuick25').addEventListener('click', (e) => {
+        const amount = e.currentTarget.getAttribute('data-amount');
+        handleQuickDonate(amount, e.currentTarget);
+      });
+      document.getElementById('donateQuick50').addEventListener('click', (e) => {
+        const amount = e.currentTarget.getAttribute('data-amount');
+        handleQuickDonate(amount, e.currentTarget);
+      });
+
+      document.getElementById('donateCustomOpen').addEventListener('click', () => {
+        document.getElementById('modalDonate').style.display = 'flex';
+      });
+
+      function handleQuickDonate(amount, btnEl) {
+        // mark active
+        document.querySelectorAll('.donate-btn').forEach(b => b.classList.remove('active'));
+        if (btnEl) btnEl.classList.add('active');
+        console.log('[DONATE] quick donate clicked:', amount);
+        // open PayPal.me with amount
+        const url = `${PAYPAL_BASE}/${encodeURIComponent(PAYPAL_ME_ID)}/${encodeURIComponent(amount)}`;
+        openUrlInNewTab(url);
+        showToast(`Ouverture PayPal pour ${amount}€`);
+      }
+
+      function openDonateModal(amount) {
+        const modal = document.getElementById('modalDonate');
+        modal.style.display = 'flex';
+        // prefill if needed
+        const btns = modal.querySelectorAll('button[data-amount]');
+        btns.forEach(b => {
+          if (b.getAttribute('data-amount') == amount) b.classList.add('active');
+          else b.classList.remove('active');
+        });
+      }
+
+      document.getElementById('btnDonate').addEventListener('click', () => {
+        document.getElementById('modalDonate').style.display = 'flex';
+      });
+
+      document.getElementById('donateClose').addEventListener('click', () => {
+        document.getElementById('modalDonate').style.display = 'none';
+      });
+
+      // donate modal quick amount buttons
+      document.querySelectorAll('#modalDonate button[data-amount]').forEach(b => {
+        b.addEventListener('click', (e) => {
+          const amt = e.currentTarget.getAttribute('data-amount');
+          document.getElementById('donateCustom').value = amt;
+          // visual active
+          document.querySelectorAll('#modalDonate button[data-amount]').forEach(x => x.classList.remove('active'));
+          e.currentTarget.classList.add('active');
+        });
+      });
+
+      document.getElementById('donateProceed').addEventListener('click', () => {
+        const custom = document.getElementById('donateCustom').value;
+        let amount = parseFloat(String(custom).replace(',', '.'));
+        if (!amount || isNaN(amount) || amount <= 0) {
+          showToast('Saisis un montant valide.');
+          return;
+        }
+        // ouvre la page PayPal.me avec montant
+        const url = `${PAYPAL_BASE}/${encodeURIComponent(PAYPAL_ME_ID)}/${encodeURIComponent(amount)}`;
+        openUrlInNewTab(url);
+        document.getElementById('modalDonate').style.display = 'none';
+        console.log('[DONATE] proceed with amount:', amount);
+      });
+
+      // close donate modal when clicking outside card
+      document.getElementById('modalDonate').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) e.currentTarget.style.display = 'none';
+      });
+
+    })();
+
+    /* ---------- Signup form handling (Google Form) ---------- */
+    function onSignupSubmit(e) {
+      // allow default POST to Google Forms via target iframe
+      try {
+        const modal = document.getElementById('signupSuccessModal');
+        modal.style.display = 'flex';
+        modal.classList.add('active');
+        showToast('Inscription envoyée. Merci !');
+
+        // reset form shortly after to avoid duplicate visible data
+        setTimeout(() => {
+          try { document.getElementById('signupForm').reset(); } catch (err) {}
+        }, 600);
+
+        // Buttons of the success modal
+        document.getElementById('signupSuccessClose').onclick = () => {
+          modal.style.display = 'none';
+          modal.classList.remove('active');
+        };
+        document.getElementById('signupSuccessPay').onclick = () => {
+          // open PayPal.me base (user can choose amount) or you can prefill with amount
+          const url = `${PAYPAL_BASE}/${encodeURIComponent(PAYPAL_ME_ID)}`;
+          openUrlInNewTab(url);
+          modal.style.display = 'none';
+          modal.classList.remove('active');
+        };
+
+        // close when clicking backdrop
+        modal.addEventListener('click', (ev) => {
+          if (ev.target === modal) {
+            modal.style.display = 'none';
+            modal.classList.remove('active');
+          }
+        });
+
+        console.log('[SIGNUP] form submitted (posted to Google Forms).');
+      } catch (err) {
+        setTimeout(() => {
+          alert('Merci ! Ton inscription a été envoyée.');
+          try { document.getElementById('signupForm').reset(); } catch (e) {}
+        }, 600);
+      }
+    }
+
+    /* ---------- Auth modal (connexion / inscription) ---------- */
+    (function(){
+      const btnLogin = document.getElementById('btnLogin');
+      const btnSignup = document.getElementById('btnSignup');
+      const modalAuth = document.getElementById('modalAuth');
+      const authClose = document.getElementById('authClose');
+      const authLogin = document.getElementById('authLogin');
+      const authRegister = document.getElementById('authRegister');
+
+      btnLogin.addEventListener('click', () => {
+        openAuthModal('login');
+      });
+      btnSignup.addEventListener('click', () => {
+        openAuthModal('register');
+      });
+
+      function openAuthModal(mode) {
+        modalAuth.style.display = 'flex';
+        if (mode === 'register') {
+          document.getElementById('authTitle').textContent = 'Inscription';
+        } else {
+          document.getElementById('authTitle').textContent = 'Connexion';
+        }
+      }
+
+      authClose.addEventListener('click', () => {
+        modalAuth.style.display = 'none';
+      });
+
+      // clicking outside closes
+      modalAuth.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) modalAuth.style.display = 'none';
+      });
+
+      // Simulated auth actions (demo only)
+      authLogin.addEventListener('click', () => {
+        const email = document.getElementById('authEmail').value;
+        if (!email) { showToast('Saisis ton adresse e‑mail.'); return; }
+        showToast('Connexion simulée pour ' + email);
+        console.log('[AUTH] simulated login for', email);
+        modalAuth.style.display = 'none';
+      });
+
+      authRegister.addEventListener('click', () => {
+        const email = document.getElementById('authEmail').value;
+        if (!email) { showToast('Saisis ton adresse e‑mail.'); return; }
+        showToast('Inscription simulée pour ' + email);
+        console.log('[AUTH] simulated register for', email);
+        modalAuth.style.display = 'none';
+      });
+    })();
+
+    /* ---------- VIP / PRO modal handling (server-side validation attempt with fallback) ---------- */
+    (function(){
+      const vipKeyBtn = document.getElementById('vipKeyBtn');
+      const proKeyBtn = document.getElementById('proKeyBtn');
+      const vipModal = document.getElementById('vipModal');
+      const vipCancel = document.getElementById('vipCancel');
+      const vipSubmit = document.getElementById('vipSubmit');
+      const vipCodeInput = document.getElementById('vipCodeInput');
+      const vipIndicator = document.getElementById('vipIndicator');
+      const proIndicator = document.getElementById('proIndicator');
+
+      vipKeyBtn.addEventListener('click', () => {
+        vipModal.classList.add('active');
+        vipModal.setAttribute('aria-hidden', 'false');
+        vipCodeInput.value = '';
+        vipCodeInput.dataset.type = 'vip';
+      });
+
+      proKeyBtn.addEventListener('click', () => {
+        vipModal.classList.add('active');
+        vipModal.setAttribute('aria-hidden', 'false');
+        vipCodeInput.value = '';
+        vipCodeInput.dataset.type = 'pro';
+      });
+
+      vipCancel.addEventListener('click', () => {
+        vipModal.classList.remove('active');
+        vipModal.setAttribute('aria-hidden', 'true');
+      });
+
+      vipSubmit.addEventListener('click', async () => {
+        const code = vipCodeInput.value.trim();
+        const type = vipCodeInput.dataset.type || 'vip';
+        if (!code) {
+          showToast('Saisis une clé.');
+          return;
+        }
+        console.log('[VIP] submit key attempt', { code, type });
+
+        // Tentative de validation côté serveur via API (Node/Express)
+        try {
+          const resp = await fetch(VIP_VALIDATE_ENDPOINT, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ key: code, type })
+          });
+          if (resp.ok) {
+            const data = await resp.json();
+            if (data && data.valid) {
+              // serveur confirme la clé
+              if (type === 'vip') {
+                vipIndicator.style.display = 'inline-block';
+                document.getElementById('vipStatus').textContent = data.message || 'Accès activé — BETA';
+              } else {
+                proIndicator.style.display = 'inline-block';
+                document.getElementById('proStatus').textContent = data.message || 'Accès PRO activé';
+              }
+              showToast('Clé acceptée (serveur).');
+              console.log('[VIP] server validated key', data);
+            } else {
+              showToast('Clé invalide (serveur).');
+              console.warn('[VIP] server rejected key', data);
+            }
+          } else {
+            // serveur non disponible ou erreur -> fallback client-side
+            console.warn('[VIP] server validation failed, status', resp.status);
+            fallbackClientValidation(code, type);
+          }
+        } catch (err) {
+          console.warn('[VIP] server validation error', err);
+          // fallback to client-side simulation
+          fallbackClientValidation(code, type);
+        }
+
+        vipModal.classList.remove('active');
+        vipModal.setAttribute('aria-hidden', 'true');
+      });
+
+      function fallbackClientValidation(code, type) {
+        // Client-side simulation keys (only for local testing)
+        const normalized = code.toUpperCase();
+        if (normalized === 'VIP-BETA-TEST-LOXE') {
+          vipIndicator.style.display = 'inline-block';
+          document.getElementById('vipStatus').textContent = 'Accès activé — BETA (local)';
+          showToast('Clé V.I.P. acceptée (local).');
+          console.log('[VIP] local accepted VIP key');
+        } else if (normalized === 'PRO-ACCESS-TEST-LOXE') {
+          proIndicator.style.display = 'inline-block';
+          document.getElementById('proStatus').textContent = 'Accès PRO activé (local)';
+          showToast('Clé PRO acceptée (local).');
+          console.log('[VIP] local accepted PRO key');
+        } else {
+          showToast('Clé invalide (local).');
+          console.log('[VIP] local rejected key');
+        }
+      }
+
+      // close when clicking backdrop
+      vipModal.addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
+          vipModal.classList.remove('active');
+          vipModal.setAttribute('aria-hidden', 'true');
+        }
+      });
+    })();
+
+    /* ---------- Dark mode toggle (simple) ---------- */
+    (function(){
+      const darkToggle = document.getElementById('darkToggle');
+      darkToggle.addEventListener('change', (e) => {
+        if (e.target.checked) {
+          // Mode sombre activé : assombrir légèrement et ajuster couleurs
+          document.body.style.filter = 'brightness(0.9)';
+          document.documentElement.style.setProperty('--bg-overlay', 'rgba(0,0,0,0.18)');
+          showToast('Mode sombre activé');
+          console.log('[UI] dark mode on');
+        } else {
+          document.body.style.filter = '';
+          document.documentElement.style.setProperty('--bg-overlay', 'rgba(255,255,255,0.02)');
+          showToast('Mode sombre désactivé');
+          console.log('[UI] dark mode off');
+        }
+      });
+    })();
+
+    /* ---------- Accessibility: keyboard close modals on Escape ---------- */
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        const modals = document.querySelectorAll('.modal-backdrop');
+        modals.forEach(m => { m.classList.remove('active'); m.style.display = 'none'; m.setAttribute('aria-hidden', 'true'); });
+        const modalAuth = document.getElementById('modalAuth');
+        if (modalAuth) modalAuth.style.display = 'none';
+      }
+    });
+
+    /* ---------- Small UX: prevent form submit on Enter in auth modal to avoid accidental posts ---------- */
+    try {
+      document.getElementById('authEmail').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') e.preventDefault();
+      });
+      document.getElementById('authPassword').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') e.preventDefault();
+      });
+    } catch (err) { /* ignore if elements not present yet */ }
+
+    /* ---------- End of script ---------- */
+    console.log('[INIT] LOX E portal script loaded');
+  </script>
+</body>
+</html>
